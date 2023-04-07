@@ -26,13 +26,11 @@ describe('/threads endpoint', () => {
         password: 'password',
         fullname: 'A Fullname',
       };
-      const responseUsers = await server.inject({
+      await server.inject({
         method: 'POST',
         url: '/users',
         payload: requestPayloadUser,
       });
-      const responseJsonUser = JSON.parse(responseUsers.payload);
-      const { addedUser } = responseJsonUser.data;
       /** Login user */
       const responseAuths = await server.inject({
         method: 'POST',
@@ -48,7 +46,6 @@ describe('/threads endpoint', () => {
       const requestPayload = {
         title: 'A title',
         body: 'A body',
-        user_id: addedUser.id,
       };
 
       // Action
@@ -77,13 +74,11 @@ describe('/threads endpoint', () => {
         password: 'password',
         fullname: 'A Fullname',
       };
-      const responseUsers = await server.inject({
+      await server.inject({
         method: 'POST',
         url: '/users',
         payload: requestPayloadUser,
       });
-      const responseJsonUser = JSON.parse(responseUsers.payload);
-      const { addedUser } = responseJsonUser.data;
       /** Login user */
       const responseAuths = await server.inject({
         method: 'POST',
@@ -98,7 +93,6 @@ describe('/threads endpoint', () => {
       /** Thread payload */
       const requestPayload = {
         title: 'A title',
-        user_id: addedUser.id,
       };
 
       // Action
@@ -127,13 +121,11 @@ describe('/threads endpoint', () => {
         password: 'password',
         fullname: 'A Fullname',
       };
-      const responseUsers = await server.inject({
+      await server.inject({
         method: 'POST',
         url: '/users',
         payload: requestPayloadUser,
       });
-      const responseJsonUser = JSON.parse(responseUsers.payload);
-      const { addedUser } = responseJsonUser.data;
       /** Login user */
       const responseAuths = await server.inject({
         method: 'POST',
@@ -148,8 +140,7 @@ describe('/threads endpoint', () => {
       /** Thread payload */
       const requestPayload = {
         title: 'A title',
-        body: 'A body',
-        user_id: [addedUser.id],
+        body: ['A body'],
       };
 
       // Action
@@ -174,7 +165,6 @@ describe('/threads endpoint', () => {
       const requestPayload = {
         title: 'A title',
         body: 'A body',
-        user_id: 'user-123',
       };
       const server = await createServer(container);
 
@@ -190,6 +180,79 @@ describe('/threads endpoint', () => {
       expect(response.statusCode).toEqual(401);
       expect(responseJson.error).toEqual('Unauthorized');
       expect(responseJson.message).toEqual('Missing authentication');
+    });
+  });
+
+  describe('when GET /threads/{threadId}', () => {
+    it('should response 200 and get a thread detail with comments', async () => {
+      // Arrange
+      const server = await createServer(container);
+      /** Add user */
+      const requestPayloadUser = {
+        username: 'username',
+        password: 'password',
+        fullname: 'A Fullname',
+      };
+      await server.inject({
+        method: 'POST',
+        url: '/users',
+        payload: requestPayloadUser,
+      });
+      /** Login user */
+      const responseAuths = await server.inject({
+        method: 'POST',
+        url: '/authentications',
+        payload: {
+          username: requestPayloadUser.username,
+          password: requestPayloadUser.password,
+        },
+      });
+      const responseJsonAuth = JSON.parse(responseAuths.payload);
+      const { accessToken } = responseJsonAuth.data;
+      /** Add Thread */
+      const requestPayloadThread = {
+        title: 'A title',
+        body: 'A body',
+      };
+      const responseThreads = await server.inject({
+        method: 'POST',
+        url: '/threads',
+        payload: requestPayloadThread,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const responseJsonThreads = JSON.parse(responseThreads.payload);
+      const { addedThread } = responseJsonThreads.data;
+
+      // Action
+      const response = await server.inject({
+        method: 'GET',
+        url: `/threads/${addedThread.id}`,
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJson.status).toEqual('success');
+      expect(responseJson.data.thread).toBeDefined();
+    });
+
+    it('should response 404 when thread doesn\'t exist', async () => {
+      // Arrange
+      const server = await createServer(container);
+
+      // Action
+      const response = await server.inject({
+        method: 'GET',
+        url: '/threads/thread-123',
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('thread tidak ditemukan');
     });
   });
 });
