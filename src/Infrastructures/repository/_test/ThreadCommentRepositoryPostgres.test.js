@@ -94,7 +94,7 @@ describe('CommentRepositoryPostgres', () => {
       expect(addedComment).toStrictEqual(new AddedThreadComment({
         id: 'comment-123',
         content: comment.content,
-        owner: registeredUser.id,
+        user_id: registeredUser.id,
       }));
     });
   });
@@ -125,49 +125,14 @@ describe('CommentRepositoryPostgres', () => {
       expect(comments[0].id).toEqual('comment-123');
       expect(comments[0].content).toEqual('content');
       expect(comments[0].username).toEqual('Jose');
+      expect(comments[0].is_delete).toEqual(0);
       expect(comments[0]).toStrictEqual(new GetThreadComment({
         id: 'comment-123',
         content: 'content',
         date: comments[0].date,
         username: 'Jose',
+        is_delete: 0,
       }));
-    });
-
-    it('should return array of list comments when thread found and hidden content if some of comment is deleted', async () => {
-      // Arrange
-      await UsersTableTestHelper.addUser({ id: 'user-123', username: 'Jose' });
-      await ThreadsTableTestHelper.addThread({ id: 'thread-123', user_id: 'user-123' });
-      await ThreadCommentsTableTestHelper.addComment({
-        id: 'comment-123', content: 'content', thread_id: 'thread-123', user_id: 'user-123',
-      });
-      await new Promise((resolve, reject) => {
-        const myInterval = setInterval(async () => {
-          await ThreadCommentsTableTestHelper.addComment({
-            id: 'comment-124', content: 'content', thread_id: 'thread-123', user_id: 'user-123',
-          });
-          clearInterval(myInterval);
-          resolve();
-          reject();
-        }, 100);
-      });
-      await ThreadCommentsTableTestHelper.softDeleteComment('comment-124');
-      const commentRepositoryPostgres = new ThreadCommentRepositoryPostgres(pool, {});
-
-      // Action
-      const comments = await commentRepositoryPostgres.getCommentsByThreadId('thread-123');
-
-      // Assert
-      expect(comments).toHaveLength(2);
-      expect(comments[0].id).toEqual('comment-123');
-      expect(comments[0].content).toEqual('content');
-      expect(comments[0].username).toEqual('Jose');
-      expect(comments[0]).toStrictEqual(new GetThreadComment({
-        id: 'comment-123',
-        content: 'content',
-        date: comments[0].date,
-        username: 'Jose',
-      }));
-      expect(comments[1].content).toEqual('**komentar telah dihapus**');
     });
   });
 
@@ -225,6 +190,7 @@ describe('CommentRepositoryPostgres', () => {
         content: 'content',
         date: comment.date,
         username: 'Jose',
+        is_delete: 0,
       }));
     });
   });

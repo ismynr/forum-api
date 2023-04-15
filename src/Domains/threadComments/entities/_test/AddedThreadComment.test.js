@@ -15,7 +15,7 @@ describe('AddedThreadComment entities', () => {
     const payload = {
       id: 'comment-123',
       content: [],
-      owner: 'user-123',
+      user_id: 'user-123',
     };
     // Action & Assert
     expect(() => new AddedThreadComment(payload)).toThrowError('ADDED_THREAD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');
@@ -26,13 +26,13 @@ describe('AddedThreadComment entities', () => {
     const payload = {
       id: 'comment-123',
       content: 'A content',
-      owner: 'user-123',
+      user_id: 'user-123',
     };
     // Action
     const { id, content, owner } = new AddedThreadComment(payload);
     // Assert
     expect(id).toEqual(payload.id);
     expect(content).toEqual(payload.content);
-    expect(owner).toEqual(payload.owner);
+    expect(owner).toEqual(payload.user_id);
   });
 });

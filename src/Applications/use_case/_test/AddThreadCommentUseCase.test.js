@@ -23,7 +23,7 @@ describe('AddCommentUseCase', () => {
     const mockAddedComment = new AddedComment({
       id: 'comment-123',
       content: 'A content of comment',
-      owner: 'id of user that comment',
+      user_id: 'id of user that comment',
     });
     /** creating dependency of use case */
     const mockCommentRepository = new ThreadCommentRepository();
@@ -46,7 +46,7 @@ describe('AddCommentUseCase', () => {
     expect(addedComment).toStrictEqual(new AddedComment({
       id: 'comment-123',
       content: 'A content of comment',
-      owner: 'id of user that comment',
+      user_id: 'id of user that comment',
     }));
     expect(mockCommentRepository.addComment).toBeCalledWith(new AddComment(useCasePaylaod));
     expect(mockThreadRepository.verifyFoundThreadById).toBeCalledWith(thread.id);

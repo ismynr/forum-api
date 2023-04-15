@@ -4,10 +4,10 @@ class AddedThreadComment {
 
     this.id = payload.id;
     this.content = payload.content;
-    this.owner = payload.owner;
+    this.owner = payload.user_id;
   }
 
-  _verifyPayload({ id, content, owner }) {
+  _verifyPayload({ id, content, user_id: owner }) {
     if (!id || !content || !owner) {
       throw new Error('ADDED_THREAD_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
     }

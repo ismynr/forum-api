@@ -20,10 +20,7 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
       values: [id, content, threadId, userId],
     };
     const result = await this._pool.query(query);
-    return new AddedThreadComment({
-      ...result.rows[0],
-      owner: result.rows[0].user_id,
-    });
+    return new AddedThreadComment(result.rows[0]);
   }
 
   async getCommentsByThreadId(threadId) {
@@ -32,19 +29,7 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
       values: [threadId],
     };
     const result = await this._pool.query(query);
-    if (!result.rowCount) {
-      return [];
-    }
-    return result.rows.map((comment) => {
-      const content = comment.is_delete === 1
-        ? '**komentar telah dihapus**'
-        : comment.content;
-      return new GetThreadComment({
-        ...comment,
-        content,
-        date: comment.date.toString(),
-      });
-    });
+    return result.rows.map((comment) => new GetThreadComment(comment));
   }
 
   async verifyUsersComment(commentId, userId) {

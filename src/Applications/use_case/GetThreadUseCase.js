@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 const ThreadCommentRepository = require('../../Domains/threadComments/ThreadCommentRepository');
+const GetThreadComment = require('../../Domains/threadComments/entities/GetThreadComment');
 // eslint-disable-next-line no-unused-vars
 const ThreadRepository = require('../../Domains/threads/ThreadRepository');
 
@@ -15,9 +16,10 @@ class GetThreadUseCase {
     this._validatePayload(useCasePayload);
     const thread = await this._threadRepository.getThreadById(useCasePayload.id);
     const comments = await this._threadCommentRepository.getCommentsByThreadId(useCasePayload.id);
-    return comments.length > 0
-      ? { ...thread, comments }
-      : thread;
+    if (comments.length > 0) {
+      thread.comments = comments.map((comment) => new GetThreadComment(comment));
+    }
+    return thread;
   }
 
   _validatePayload(payload) {
