@@ -97,7 +97,7 @@ class ThreadsHandler {
     });
 
     const response = h.response({
-      status: 'fail',
+      status: 'success',
     });
     response.code(200);
     return response;
