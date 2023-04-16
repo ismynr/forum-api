@@ -25,7 +25,17 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
 
   async getCommentsByThreadId(threadId) {
     const query = {
-      text: 'SELECT * FROM thread_comments INNER JOIN (SELECT id as user_id, username FROM users) users ON thread_comments.user_id = users.user_id WHERE thread_comments.thread_id = $1 ORDER BY thread_comments ASC',
+      text: `
+        SELECT *, COALESCE("likeCount", 0) as "likeCount" FROM thread_comments
+        INNER JOIN (
+            SELECT id as user_id, username FROM users
+          ) AS users 
+          ON thread_comments.user_id = users.user_id 
+        LEFT JOIN (
+            SELECT COUNT(comment_id) as "likeCount", comment_id FROM thread_comment_likes GROUP BY comment_id
+          ) AS thread_comment_likes 
+          ON thread_comments.id = thread_comment_likes.comment_id 
+        WHERE thread_comments.thread_id = $1 ORDER BY thread_comments.date ASC`,
       values: [threadId],
     };
     const result = await this._pool.query(query);
@@ -45,17 +55,24 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
 
   async getCommentById(commentId) {
     const query = {
-      text: 'SELECT * FROM thread_comments INNER JOIN (SELECT id as user_id, username FROM users) users ON thread_comments.user_id = users.user_id WHERE id = $1',
+      text: `
+        SELECT *, COALESCE("likeCount", 0) as "likeCount" FROM thread_comments
+        INNER JOIN (
+            SELECT id as user_id, username FROM users
+          ) AS users 
+          ON thread_comments.user_id = users.user_id
+        LEFT JOIN (
+            SELECT COUNT(comment_id) as "likeCount", comment_id FROM thread_comment_likes GROUP BY comment_id
+          ) AS thread_comment_likes 
+          ON thread_comments.id = thread_comment_likes.comment_id 
+        WHERE thread_comments.id = $1 ORDER BY thread_comments.date ASC`,
       values: [commentId],
     };
     const result = await this._pool.query(query);
     if (!result.rowCount) {
       throw new NotFoundError('comment tidak ditemukan');
     }
-    return new GetThreadComment({
-      ...result.rows[0],
-      date: result.rows[0].date.toString(),
-    });
+    return new GetThreadComment(result.rows[0]);
   }
 
   async deleteComment(commentId) {
@@ -68,6 +85,17 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
       throw new InvariantError('tidak dapat menghapus comment ini');
     }
     return result.rowCount > 0;
+  }
+
+  async verifyFoundCommentById(commentId) {
+    const query = {
+      text: 'SELECT id FROM thread_comments WHERE id = $1',
+      values: [commentId],
+    };
+    const result = await this._pool.query(query);
+    if (!result.rowCount) {
+      throw new NotFoundError('comment tidak ditemukan');
+    }
   }
 }
 

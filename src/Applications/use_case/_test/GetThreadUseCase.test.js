@@ -52,6 +52,7 @@ describe('GetThreadUseCase', () => {
         date: 'A Date',
         username: user.username,
         is_delete: 0,
+        likeCount: 0,
       }),
       new GetThreadComment({
         id: 'comment-124',
@@ -59,6 +60,7 @@ describe('GetThreadUseCase', () => {
         date: 'A Date',
         username: user.username,
         is_delete: 1,
+        likeCount: 0,
       }),
     ];
     const expectedGetThreadComments = [
@@ -68,6 +70,7 @@ describe('GetThreadUseCase', () => {
         date: 'A Date',
         username: user.username,
         is_delete: 0,
+        likeCount: 0,
       }),
       new GetThreadComment({
         id: 'comment-124',
@@ -75,6 +78,7 @@ describe('GetThreadUseCase', () => {
         date: 'A Date',
         username: user.username,
         is_delete: 1,
+        likeCount: 0,
       }),
     ];
     /** creating dependency of use case */
