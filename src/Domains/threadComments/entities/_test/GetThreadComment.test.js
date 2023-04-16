@@ -18,6 +18,7 @@ describe('GetThreadComment entities', () => {
       date: 'A date',
       username: 'A username',
       is_delete: null,
+      likeCount: null,
     };
     const payload2 = {
       id: 'A id',
@@ -25,6 +26,7 @@ describe('GetThreadComment entities', () => {
       date: 'A date',
       username: 'A username',
       is_delete: undefined,
+      likeCount: undefined,
     };
 
     // Action && Assert
@@ -40,6 +42,7 @@ describe('GetThreadComment entities', () => {
       date: 'A date',
       username: 11111,
       is_delete: 0,
+      likeCount: 0,
     };
     const payload2 = {
       id: 'A id',
@@ -47,6 +50,7 @@ describe('GetThreadComment entities', () => {
       date: 'A date',
       username: 'A username',
       is_delete: '1',
+      likeCount: '1',
     };
     // Action & Assert
     expect(() => new GetThreadComment(payload)).toThrowError('ADD_THREAD_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');
@@ -61,10 +65,11 @@ describe('GetThreadComment entities', () => {
       date: 'A date',
       username: 'A username',
       is_delete: 0,
+      likeCount: 0,
     };
     // Action
     const {
-      id, content, date, username, is_delete: isDelete,
+      id, content, date, username, is_delete: isDelete, likeCount,
     } = new GetThreadComment(payload);
     // Assert
     expect(id).toEqual(payload.id);
@@ -72,5 +77,6 @@ describe('GetThreadComment entities', () => {
     expect(date).toEqual(payload.date);
     expect(username).toEqual(payload.username);
     expect(isDelete).toEqual(payload.is_delete);
+    expect(likeCount).toEqual(payload.likeCount);
   });
 });

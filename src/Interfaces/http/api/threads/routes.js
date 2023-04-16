@@ -1,3 +1,11 @@
+// eslint-disable-next-line no-unused-vars
+const ThreadsHandler = require('./handler');
+
+/**
+ *
+ * @param {ThreadsHandler} handler
+ * @returns
+ */
 const routes = (handler) => ([
   {
     method: 'POST',
@@ -24,6 +32,14 @@ const routes = (handler) => ([
     method: 'DELETE',
     path: '/threads/{threadId}/comments/{commentId}',
     handler: handler.deleteThreadCommentHandler,
+    options: {
+      auth: 'forum_jwt',
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/threads/{threadId}/comments/{commentId}/likes',
+    handler: handler.likeUnlikeThreadCommentHandler,
     options: {
       auth: 'forum_jwt',
     },

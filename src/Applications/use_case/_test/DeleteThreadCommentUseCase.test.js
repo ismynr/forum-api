@@ -44,6 +44,7 @@ describe('DeleteThreadCommentUseCase', () => {
       date: 'A Date',
       username: user.username,
       is_delete: 0,
+      likeCount: 0,
     });
     /** creating dependency of use case */
     const mockThreadCommentRepository = new ThreadCommentRepository();

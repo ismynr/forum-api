@@ -10,5 +10,6 @@ describe('CommentRepository interface', () => {
     await expect(commentRepository.verifyUsersComment({})).rejects.toThrowError('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
     await expect(commentRepository.getCommentById({})).rejects.toThrowError('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
     await expect(commentRepository.deleteComment({})).rejects.toThrowError('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
+    await expect(commentRepository.verifyFoundCommentById({})).rejects.toThrowError('THREAD_COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   });
 });
